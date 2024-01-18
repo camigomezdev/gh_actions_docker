@@ -1,0 +1,137 @@
+{
+  "name": "react-csr-hmr-docker-boilerplate",
+  "version": "0.2.13",
+  "description": "",
+  "engines": {
+    "node": ">=10.13.0"
+  },
+  "scripts": {
+    "start-message": "babel-node build-tools/startMessage.js",
+    "prestart": "yarn run start-message",
+    "dev": "yarn start",
+    "docker:build": "docker build --rm -t my-react-app:latest .",
+    "docker:start": "docker run -p 3001:80 --name my-react-app --rm my-react-app:latest",
+    "docker:serve": "yarn run docker:build && yarn run docker:start",
+    "start": "yarn run open:src",
+    "open:src": "babel-node build-tools/srcServer.js",
+    "open:dist": "babel-node build-tools/distServer.js",
+    "lint": "esw webpack/webpack.config.* src build-tools --color",
+    "lint:watch": "yarn run lint -- --watch",
+    "clean-dist": "yarn run remove-dist && mkdir dist",
+    "remove-dist": "npx rimraf ./dist",
+    "prebuild": "yarn run lint && yarn run test && yarn run clean-dist",
+    "build": "babel-node build-tools/build.js",
+    "serve": "yarn run open:dist",
+    "test": "jest",
+    "test:CI": "jest",
+    "test:cover": "yarn run test --coverage ",
+    "test:watch": "jest --watchAll",
+    "open:cover": "yarn run test:cover && open-cli ./coverage/lcov-report/index.html",
+    "analyze-bundle": "babel-node ./build-tools/analyzeBundle.js",
+    "prettier": "prettier --write \"{,!(node_modules|dist|build|coverage)/**/}*.{js,jsx,html,scss,css,json}\"",
+    "precommit": "lint-staged && yarn lint && yarn run test",
+    "manage-release": "npx standard-version"
+  },
+  "author": "Tushar Sharma (ts17995@gmail.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@hot-loader/react-dom": "~16.10.2",
+    "core-js": "~3.3.4",
+    "object-assign": "~4.1.1",
+    "react": "~16.11.0",
+    "react-dom": "~16.11.0",
+    "react-imported-component": "~6.2.0",
+    "react-router-dom": "~5.1.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "~7.6.4",
+    "@babel/core": "~7.6.4",
+    "@babel/node": "~7.6.3",
+    "@babel/plugin-proposal-class-properties": "~7.5.5",
+    "@babel/plugin-syntax-dynamic-import": "~7.2.0",
+    "@babel/plugin-transform-react-constant-elements": "~7.6.3",
+    "@babel/plugin-transform-runtime": "~7.6.2",
+    "@babel/preset-env": "~7.6.3",
+    "@babel/preset-react": "~7.6.3",
+    "@commitlint/cli": "~8.2.0",
+    "@commitlint/config-conventional": "~8.2.0",
+    "autoprefixer": "~9.7.0",
+    "babel-core": "~7.0.0-bridge.0",
+    "babel-eslint": "~10.0.3",
+    "babel-jest": "~24.9.0",
+    "babel-loader": "~8.0.6",
+    "babel-plugin-import": "~1.12.2",
+    "babel-plugin-transform-react-remove-prop-types": "~0.4.24",
+    "browser-sync": "~2.26.7",
+    "chalk": "~2.4.2",
+    "compression-webpack-plugin": "~3.0.0",
+    "connect-history-api-fallback": "~1.6.0",
+    "coveralls": "~3.0.7",
+    "css-loader": "~3.2.0",
+    "cssnano": "~4.1.10",
+    "enzyme": "~3.10.0",
+    "enzyme-adapter-react-16": "~1.15.1",
+    "eslint": "~6.6.0",
+    "eslint-config-prettier": "~6.5.0",
+    "eslint-plugin-import": "~2.18.2",
+    "eslint-plugin-prettier": "~3.1.1",
+    "eslint-plugin-react": "~7.16.0",
+    "eslint-watch": "~6.0.1",
+    "file-loader": "~4.2.0",
+    "hard-source-webpack-plugin": "~0.13.1",
+    "html-webpack-plugin": "~3.2.0",
+    "husky": "~3.0.9",
+    "identity-obj-proxy": "~3.0.0",
+    "jest": "~24.9.0",
+    "jest-cli": "~24.9.0",
+    "lint-staged": "~9.4.2",
+    "mini-css-extract-plugin": "~0.8.0",
+    "node-sass": "~4.13.0",
+    "open-cli": "~5.0.0",
+    "postcss-loader": "~3.0.0",
+    "prettier": "~1.18.2",
+    "prop-types": "~15.7.2",
+    "raf": "~3.4.1",
+    "react-hot-loader": "~4.12.15",
+    "rimraf": "~3.0.0",
+    "sass-loader": "~8.0.0",
+    "semantic-release": "~15.13.28",
+    "standard-version": "~7.0.0",
+    "style-loader": "~1.0.0",
+    "url-loader": "~2.2.0",
+    "webpack": "~4.41.2",
+    "webpack-bundle-analyzer": "~3.6.0",
+    "webpack-dev-middleware": "~3.7.2",
+    "webpack-hot-middleware": "~2.25.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/build-tools/assetsTransformer.js",
+      "\\.(css)$": "<rootDir>/build-tools/assetsTransformer.js"
+    },
+    "setupFiles": [
+      "raf/polyfill",
+      "./build-tools/enzymeTestAdapterSetup.js"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,json,html,css,scss,md}": [
+      "yarn manage-release",
+      "npx prettier --write",
+      "git add package.json",
+      "git add"
+    ]
+  },
+  "standard-version": {
+    "skip": {
+      "commit": true,
+      "changelog": true,
+      "tag": true
+    }
+  }
+}
